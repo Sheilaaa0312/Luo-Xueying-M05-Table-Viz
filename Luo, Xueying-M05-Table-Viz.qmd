@@ -308,7 +308,7 @@ Once website analytics and search data become available, a similar table could c
 For example:
 
 | Website Metric | Possible Use in My CEP Project |
-|----|----|
+|------------------------------------|------------------------------------|
 | Page Views | Identify content receiving the most traffic |
 | Users | Compare audience size across pages |
 | Engagement Rate | Evaluate how visitors interact with content |
@@ -324,7 +324,7 @@ A future table for PhD Orthodontics could use one row for each website page and 
 For example:
 
 | Phd Orthodontics Webpage | Page Views | Engagement Rate | Search Clicks | Conversions | Conversion Rate |
-|----|---:|---:|---:|---:|---:|
+|------------|-----------:|-----------:|-----------:|-----------:|-----------:|
 | Braces | — | — | — | — | — |
 | Invisalign | — | — | — | — | — |
 | Early Orthodontics | — | — | — | — | — |
@@ -375,8 +375,8 @@ For the PhD Orthodontics project, the same design could combine:
 
 ## GitHub Repository
 
-View my M05 GitHub Repository
+[View my M05 GitHub Repository](https://github.com/Sheilaaa0312/Luo-Xueying-M05-Table-Viz)
 
 ## Published GitHub Pages Report
 
-View my Published M05 HTML Report
+[View my Published M05 HTML Report](https://sheilaaa0312.github.io/Luo-Xueying-M05-Table-Viz/)
