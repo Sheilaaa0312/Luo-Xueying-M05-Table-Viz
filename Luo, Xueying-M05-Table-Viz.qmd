@@ -1,0 +1,382 @@
+---
+title: "M05 - Visualizing Data with Tables for MSDM CEP"
+author: "Xueying Luo"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    toc-expand: true
+    number-sections: true
+    code-link: true
+    code-fold: true
+    code-tools: true
+    code-overflow: wrap
+    embed-resources: true
+    theme: cosmo
+editor: visual
+execute:
+  freeze: auto
+  warning: false
+  message: false
+---
+
+```{r}
+#| label: setup
+#| include: false
+
+library(tidyverse)
+library(gt)
+library(gtExtras)
+```
+
+# Reflection on Visualizing Data with Tables
+
+## Q1: Summarize what you learned from the videos you watched
+
+From the videos, one idea that stood out to me was the grammar of tables. A `gt` table is made up of different parts, such as the table header, column labels, table body, stub, stub head, and footer. Each part can be customized separately depending on what we want the audience to notice.
+
+I also learned that the process usually begins before using `gt()`. The data often need to be cleaned, grouped, summarized, or reshaped with functions from `dplyr`. After that, the summarized data can be passed into `gt()` and formatted step by step.
+
+Some of the functions demonstrated in the videos included:
+
+- `tab_header()` for adding a title and subtitle;
+
+- `cols_label()` for replacing variable names with reader-friendly labels;
+
+- `fmt_number()` and `fmt_currency()` for formatting numerical values;
+
+- `cols_width()` for controlling table width;
+
+- `tab_source_note()` for identifying the source of the data;
+
+- `tab_footnote()` for adding explanations to specific parts of a table;
+
+- `tab_stubhead()` for labeling the stub;
+
+- `tab_style()` for highlighting selected cells or rows;
+
+- `data_color()` for visually representing differences in numerical values; and
+
+- `opt_table_font()` for changing the appearance of the table.
+
+Another important thing I learned was that table design should help guide the reader. For example, using too many borders can make a table look crowded, but having no visual separation can also make the information difficult to follow. Formatting decisions such as spacing, alignment, color, and grouping should therefore have a purpose.
+
+::: callout-tip
+A table should make the reader's job easier instead of making the reader work harder to understand the data. More detail is not always better! For example, using too many borders can make a table look crowded, but having no visual separation can also make the information difficult to follow.
+:::
+
+## Q2: What did you like about the *`gt`* and *`gtExtras`* packages?
+
+::: panel-tabset
+## gt
+
+I liked that `gt` allows a table to be customized gradually. We can start with a very basic table by using `gt()`and then add different elements one at a time. This makes the process easier to understand because I can render the table, see what it looks like, and then decide what needs to be changed.
+
+I liked functions such as `cols_label()`, `fmt_number()`, `tab_source_note()`, and `tab_footnote()` because they make a table more understandable for an audience. The original variable names in a dataset may make sense to the person doing the analysis, but they may not make sense to a client or someone reading the final report. Changing the labels and adding explanatory notes can make the same data much easier to understand.
+
+I also liked `data_color()` because it combines numerical information with a visual cue. Instead of only reading each number individually, the reader can also use the colors to identify relatively high or low values.
+
+## gtExtras
+
+I liked `gtExtras`'s ability to put small visualizations directly inside a table. The videos demonstrated examples such as small distributions, sparklines, and inline bars. This allows a table to show exact numbers while also giving the audience a quick visual comparison.
+
+Another feature I liked was the availability of ready-made themes. Instead of manually writing many lines of formatting code every time, themes can make it faster to create a consistent and professional-looking table.
+:::
+
+## Q3: How do tables complement charts for data visualization?
+
+Charts are very useful for showing an overall pattern quickly. For example, a bar chart can make it easy to identify which category is the largest, and a line chart can make a trend over time easier to see.
+
+Tables are more useful when the audience needs to know the **exact values**. They can also show several different measures for the same categories at the same time.
+
+For example, in a digital marketing report, a chart might show which website pages generate the most conversions. A table could then provide additional information about those pages, such as:
+
+1.  page views;
+
+2.  engagement rate;
+
+3.  average engagement time;
+
+4.  conversions; and
+
+5.  conversion rate.
+
+This means the chart can communicate the main story quickly, while the table provides the details that support the story.
+
+The `gtExtras` examples also showed that the line between tables and charts does not always have to be strict. Small graphics can be placed directly inside table cells, which allows the audience to see both the numerical value and the overall pattern in one place.
+
+## Q4: Under what circumstances would you prefer to use tables rather than charts to visualize data?
+
+I would prefer to use a table when exact numerical values are important. If the audience needs to look up a specific number instead of only understanding the overall pattern, a table is usually more useful. I would also prefer a table when I need to show several metrics for the same categories. Putting many different measures into one chart can make the visualization difficult to understand, while a table can organize them into separate columns. I would still consider adding visual elements such as conditional colors or small bars to make important patterns easier to identify.
+
+# Descriptive Statistics Using pizzaplace
+
+## Q1:
+
+> Use the data for your MSDM CEP. If you don't have data yet, use the "pizzaplace" dataset, which is built-in data available within the ***gt*** package. Pick some variables relevant to your Analytics Objectives and share some descriptive statistics using ***gt*** and ***gtExtra*** functions together to show numbers and small charts in one table. This table can be presented for your presentation. In this table, incorporate the following at a minimum.
+
+Our group does not yet have data from PhD Orthodontics, so I will use the `pizzaplace` dataset from the `gt` package to practice the same workflow that could later be applied to our client data. The workflow follows the same general process demonstrated in the `gt` case study:
+
+1.  first summarize or group the data;
+
+2.  then pass the prepared data to `gt()`;
+
+3.  and finally customize the different parts of the table.
+
+## Data Preparation
+
+Before creating the table, I group the `pizzaplace` data by pizza type and calculate descriptive statistics for each group.
+
+```{r}
+#| label: prepare-pizza-data
+
+data("pizzaplace", package = "gt")
+
+pizza_summary <- pizzaplace |>
+  group_by(type) |>
+  summarize(
+    total_orders = n(),
+    total_sales = sum(price, na.rm = TRUE),
+    average_price = mean(price, na.rm = TRUE),
+    minimum_price = min(price, na.rm = TRUE),
+    maximum_price = max(price, na.rm = TRUE),
+    .groups = "drop"
+  ) |>
+  arrange(desc(total_sales))
+
+pizza_summary
+```
+
+The descriptive statistics include:
+
+- **Total Orders**: number of observations for each pizza type;
+- **Total Sales**: total dollar value of sales for each type;
+- **Average Price**: average pizza price;
+- **Minimum Price**: lowest pizza price; and
+- **Maximum Price**: highest pizza price.
+
+# Table Visualization
+
+## Pizza Sales Performance by Type
+
+The table in @tbl-pizza-summary combines `gt` and `gtExtras` functions.
+
+```{r}
+#| label: tbl-pizza-summary
+#| tbl-cap: "Pizza Sales and Pricing Summary by Pizza Type"
+
+pizza_summary |>
+  
+  gt(
+    rowname_col = "type"
+  ) |>
+  
+  tab_header(
+    title = md("**Pizza Sales Performance by Type**"),
+    subtitle = md(
+      "Comparison of **order volume**, *sales performance*, and pricing"
+    )
+  ) |>
+  
+  tab_stubhead(
+    label = md("Pizza **Type**")
+  ) |>
+  
+  tab_spanner(
+    label = md("**Sales Performance**"),
+    columns = c(
+      total_orders,
+      total_sales
+    )
+  ) |>
+  
+  tab_spanner(
+    label = md("**Price Statistics**"),
+    columns = c(
+      average_price,
+      minimum_price,
+      maximum_price
+    )
+  ) |>
+  
+  cols_label(
+    total_orders = md("Total<br>Orders"),
+    total_sales = md("Total<br>Sales"),
+    average_price = md("Average<br>Price"),
+    minimum_price = md("Minimum<br>Price"),
+    maximum_price = md("Maximum<br>Price")
+  ) |>
+  
+  fmt_number(
+    columns = total_orders,
+    decimals = 0,
+    use_seps = TRUE
+  ) |>
+  
+  fmt_currency(
+    columns = c(
+      total_sales,
+      average_price,
+      minimum_price,
+      maximum_price
+    ),
+    currency = "USD",
+    decimals = 2
+  ) |>
+  
+  data_color(
+    columns = total_sales,
+    palette = "Blues"
+  ) |>
+  
+  gt_plt_bar(
+    column = total_orders,
+    keep_column = TRUE,
+    width = 30
+  ) |>
+  
+  tab_footnote(
+    footnote = "Total Sales is calculated as the sum of pizza prices within each pizza type.",
+    locations = cells_column_labels(
+      columns = total_sales
+    )
+  ) |>
+  
+  tab_footnote(
+    footnote = "The embedded bars provide a visual comparison of order volume while keeping the exact values visible.",
+    locations = cells_column_labels(
+      columns = total_orders
+    )
+  ) |>
+  
+  tab_source_note(
+    source_note = md(
+      "Source: `pizzaplace` dataset included in the **gt** R package."
+    )
+  ) |>
+  
+  opt_align_table_header(
+    align = "left"
+  ) |>
+  
+  cols_align(
+    align = "right",
+    columns = c(
+      total_orders,
+      total_sales,
+      average_price,
+      minimum_price,
+      maximum_price
+    )
+  ) |>
+  
+  cols_width(
+    stub() ~ px(130),
+    total_orders ~ px(160),
+    total_sales ~ px(140),
+    average_price ~ px(120),
+    minimum_price ~ px(120),
+    maximum_price ~ px(120)
+  )
+```
+
+## Interpretation of the Table
+
+As shown in @tbl-pizza-summary, grouping the observations by pizza type makes the data easier to compare than looking at individual pizza transactions.
+
+The Total Orders column shows the relative order volume for each pizza category. The inline bars provide a visual comparison, while the exact order counts remain visible.
+
+The Total Sales column shows the total revenue generated by each category. The conditional color formatting provides another visual cue, making differences in sales easier to notice.
+
+The three price columns provide additional context by showing the average, minimum, and maximum prices within each category.
+
+This combination of numbers, formatting, and small visualizations demonstrates an important idea from the module: a table can communicate both exact values and visual patterns at the same time.
+
+# Application to My MSDM CEP Project
+
+## Q1: Explain why the table is worth adding to your MSDM project written report or presentation slides
+
+### Written report:
+
+This type of table would be useful in our project because our final report will need to communicate digital marketing findings clearly to the client.
+
+My Analytics Objective focuses on Content and Lead Generation Strategy, including evaluating existing website content and identifying opportunities for service pages, educational resources, FAQs, location-specific pages; and landing pages.
+
+Once website analytics and search data become available, a similar table could compare individual pages or groups of pages.
+
+For example:
+
+| Website Metric | Possible Use in My CEP Project |
+|----|----|
+| Page Views | Identify content receiving the most traffic |
+| Users | Compare audience size across pages |
+| Engagement Rate | Evaluate how visitors interact with content |
+| Average Engagement Time | Estimate how much attention visitors give each page |
+| Search Impressions | Measure organic search visibility |
+| Search Clicks | Measure traffic generated from search |
+| Click-Through Rate | Evaluate search-result performance |
+| Conversions | Identify pages contributing to consultation leads |
+| Conversion Rate | Compare lead-generation effectiveness |
+
+A future table for PhD Orthodontics could use one row for each website page and several performance metrics as columns.
+
+For example:
+
+| Phd Orthodontics Webpage | Page Views | Engagement Rate | Search Clicks | Conversions | Conversion Rate |
+|----|---:|---:|---:|---:|---:|
+| Braces | — | — | — | — | — |
+| Invisalign | — | — | — | — | — |
+| Early Orthodontics | — | — | — | — | — |
+| Pediatric Orthodontics | — | — | — | — | — |
+| San Gabriel Location | — | — | — | — | — |
+
+The actual values would be added once the client analytics data become available.
+
+::: callout-important
+## Why This Matters for AO3
+
+For my AO, a table like this could help identify which pages are attracting visitors, which pages are keeping visitors engaged, and which pages contribute to consultation leads. Adding conditional colors or small bars could make high-performing and low-performing content easier to recognize during our client presentation.
+:::
+
+### Presentation Slides:
+
+The table is useful for a presentation because of two reasons. First, the audience can see the exact numerical results. This is useful when they want to compare specific values. Second, the embedded bar and conditional color formatting provide visual cues that allow the audience to recognize differences more quickly.
+
+::: panel-tabset
+## Exact Values
+
+The table provides the exact:
+
+- order counts;
+- sales totals;
+- average prices;
+- minimum prices; and
+- maximum prices.
+
+## Visual Comparison
+
+The table also provides:
+
+- an inline bar visualization for order volume; and
+- conditional color for total sales.
+
+## Future CEP Use
+
+For the PhD Orthodontics project, the same design could combine:
+
+- exact website metrics;
+- small bars showing traffic;
+- colors showing conversion performance; and
+- footnotes explaining important metrics.
+:::
+
+# Appendix
+
+## GitHub Repository
+
+View my M05 GitHub Repository
+
+## Published GitHub Pages Report
+
+View my Published M05 HTML Report
